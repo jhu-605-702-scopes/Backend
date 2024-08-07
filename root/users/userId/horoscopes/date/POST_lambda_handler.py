@@ -1,10 +1,11 @@
 import boto3
 import json
+import emoji_generator.random_emoji as emojigen
 
 print('Loading function')
 
-client = boto3.client('dynamodb', region_name='us-east-2')
-table = 'Horoscopes'
+dynamo = boto3.resource('dynamodb', region_name="us-east-2")
+table_name = 'Horoscopes'
 
 def respond(err, res=None):
     return {
@@ -35,11 +36,13 @@ def lambda_handler(event, context):
         userId = event["pathParameters"]["userId"]
         date = event["pathParameters"]["date"]
         emojis = generateCoolEmojis()
-        horoscope = {"userId": userId, "date": date, "emojis": emojis}
-        client.client.put_item(
-            TableName = table,
-            Item = horoscope
-        )
+        horoscope = {"userId": userId, "date": str(date), "emojis": str(emojis)}
+        table = dynamo.Table(table_name)
+        resp = table.put_item(Item = horoscope)
         return respond(None, resp)
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))
+
+def generateCoolEmojis():
+    # [{'code': 'U+3299', 'name': 'Japanese “secret” button', 'image': '㊙', 'category': 'Symbols'}, {'code': 'U+1F6F8', 'name': 'flying saucer', 'image': '🛸', 'category': 'Travel & Places'}, {'code': 'U+271D', 'name': 'latin cross', 'image': '✝', 'category': 'Symbols'}]
+    return [(emojigen.get_random_emojis(1)[0]["image"]) for x in range(3)]
