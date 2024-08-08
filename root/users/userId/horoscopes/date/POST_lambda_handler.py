@@ -36,7 +36,7 @@ def lambda_handler(event, context):
         userId = event["pathParameters"]["userId"]
         date = event["pathParameters"]["date"]
         emojis = generateCoolEmojis()
-        horoscope = {"userId": userId, "date": str(date), "emojis": str(emojis)}
+        horoscope = {"userId": userId, "date": str(date), "emojis": str(emojis), "feedback": ""}
         table = dynamo.Table(table_name)
         resp = table.put_item(Item = horoscope)
         return respond(None, resp)
