@@ -17,7 +17,7 @@ def respond(err, res=None):
     }
 
 
-def lambda_handler(event, context):
+def post_date_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
     access to the request and response payload, including headers and
     status code.

@@ -18,7 +18,7 @@ def respond(err, res=None):
     }
 
 
-def lambda_handler(event, context):
+def get_date_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
     access to the request and response payload, including headers and
     status code.
@@ -38,12 +38,13 @@ def lambda_handler(event, context):
         # emojis = generateCoolEmojis()
         table = dynamo.Table(table_name)
         item = table.get_item(Key={
-            'userId': userId})['Item']
-        user = {"id": item['userId']['N'],
-                     "name": item['name']['S'],
-                     "username": item['username']['S'],
-                     "email": item["email"]["S"]}
+            'userId': userId,
+            'date': date})['Item']
+        horoscope = {"userId": item['userId']['N'],
+                     "date": item['date']['S'],
+                     "emojis": item['emojis']['S'],
+                     "feedback": item["feedback"]["S"]}
 
-        return respond(None, item)
+        return respond(None, horoscope)
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))

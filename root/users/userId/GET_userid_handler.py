@@ -1,4 +1,3 @@
-
 import boto3
 import json
 import emoji_generator.random_emoji as emojigen
@@ -19,7 +18,7 @@ def respond(err, res=None):
     }
 
 
-def lambda_handler(event, context):
+def get_userid_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
     access to the request and response payload, including headers and
     status code.
@@ -38,11 +37,13 @@ def lambda_handler(event, context):
         date = event["pathParameters"]["date"]
         # emojis = generateCoolEmojis()
         table = dynamo.Table(table_name)
-        item = table.delete_item(Key={
+        item = table.get_item(Key={
             'userId': userId})['Item']
+        user = {"id": item['userId']['N'],
+                     "name": item['name']['S'],
+                     "username": item['username']['S'],
+                     "email": item["email"]["S"]}
 
         return respond(None, item)
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))
-
-
