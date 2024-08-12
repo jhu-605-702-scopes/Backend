@@ -1,10 +1,12 @@
 import boto3
 import json
+import emoji_generator.random_emoji as emojigen
 
 print('Loading function')
 
 dynamo = boto3.resource('dynamodb', region_name="us-east-2")
-table_name = 'Users'
+table_name = 'Horoscopes'
+
 
 def respond(err, res=None):
     return {
@@ -16,7 +18,7 @@ def respond(err, res=None):
     }
 
 
-def post_users_handler(event, context):
+def get_horoscope_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
     access to the request and response payload, including headers and
     status code.
@@ -26,19 +28,23 @@ def post_users_handler(event, context):
     PUT, or DELETE request respectively, passing in the payload to the
     DynamoDB API as a JSON body.
     '''
-    #print("Received event: " + json.dumps(event, indent=2))
-
+    # print("Received event: " + json.dumps(event, indent=2))
 
     operation = event['httpMethod']
 
-    if operation == "POST":
-        # TODO any sort of data validation
-        body = json.load(event["body"])
-        if "userId" not in body.keys():
-            body["userId"] = generate_uuid()
+    if operation == "GET":
+        userId = event["pathParameters"]["userId"]
+        date = event["pathParameters"]["date"]
+        # emojis = generateCoolEmojis()
         table = dynamo.Table(table_name)
-        resp = table.put_item(Item = body)
-        return respond(None, resp)
+        item = table.get_item(Key={
+            'userId': userId,
+            'date': date})['Item']
+        horoscope = {"userId": item['userId']['N'],
+                     "date": item['date']['S'],
+                     "emojis": item['emojis']['S'],
+                     "feedback": item["feedback"]["S"]}
+
+        return respond(None, horoscope)
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))
-

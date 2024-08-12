@@ -7,7 +7,6 @@ print('Loading function')
 dynamo = boto3.resource('dynamodb', region_name="us-east-2")
 table_name = 'Horoscopes'
 
-
 def respond(err, res=None):
     return {
         'statusCode': '400' if err else '200',
@@ -18,7 +17,7 @@ def respond(err, res=None):
     }
 
 
-def get_date_handler(event, context):
+def post_horoscope_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
     access to the request and response payload, including headers and
     status code.
@@ -28,23 +27,22 @@ def get_date_handler(event, context):
     PUT, or DELETE request respectively, passing in the payload to the
     DynamoDB API as a JSON body.
     '''
-    # print("Received event: " + json.dumps(event, indent=2))
+    #print("Received event: " + json.dumps(event, indent=2))
+
 
     operation = event['httpMethod']
 
-    if operation == "GET":
+    if operation == "POST":
         userId = event["pathParameters"]["userId"]
         date = event["pathParameters"]["date"]
-        # emojis = generateCoolEmojis()
+        emojis = generateCoolEmojis()
+        horoscope = {"userId": userId, "date": str(date), "emojis": str(emojis), "feedback": ""}
         table = dynamo.Table(table_name)
-        item = table.get_item(Key={
-            'userId': userId,
-            'date': date})['Item']
-        horoscope = {"userId": item['userId']['N'],
-                     "date": item['date']['S'],
-                     "emojis": item['emojis']['S'],
-                     "feedback": item["feedback"]["S"]}
-
-        return respond(None, horoscope)
+        resp = table.put_item(Item = horoscope)
+        return respond(None, resp)
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))
+
+def generateCoolEmojis():
+    # [{'code': 'U+3299', 'name': 'Japanese “secret” button', 'image': '㊙', 'category': 'Symbols'}, {'code': 'U+1F6F8', 'name': 'flying saucer', 'image': '🛸', 'category': 'Travel & Places'}, {'code': 'U+271D', 'name': 'latin cross', 'image': '✝', 'category': 'Symbols'}]
+    return [(emojigen.get_random_emojis(1)[0]["image"]) for x in range(3)]

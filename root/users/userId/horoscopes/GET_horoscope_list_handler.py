@@ -5,7 +5,7 @@ import emoji_generator.random_emoji as emojigen
 print('Loading function')
 
 dynamo = boto3.resource('dynamodb', region_name="us-east-2")
-table_name = 'Users'
+table_name = 'Horoscopes'
 
 
 def respond(err, res=None):
@@ -18,7 +18,7 @@ def respond(err, res=None):
     }
 
 
-def get_users_handler(event, context):
+def get_horoscope_list_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
     access to the request and response payload, including headers and
     status code.
@@ -33,8 +33,9 @@ def get_users_handler(event, context):
     operation = event['httpMethod']
 
     if operation == "GET":
+        userId = event["pathParameters"]["userId"]
         table = dynamo.Table(table_name)
-        items = table.scan()["Items"]
+        items = table.query(KeyConditionExpression=Key('userId').eq(userId))["Items"]
         return respond(None, items)
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))

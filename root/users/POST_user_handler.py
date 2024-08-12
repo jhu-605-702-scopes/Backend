@@ -1,11 +1,10 @@
 import boto3
 import json
-import emoji_generator.random_emoji as emojigen
 
 print('Loading function')
 
 dynamo = boto3.resource('dynamodb', region_name="us-east-2")
-table_name = 'Horoscopes'
+table_name = 'Users'
 
 def respond(err, res=None):
     return {
@@ -17,7 +16,7 @@ def respond(err, res=None):
     }
 
 
-def post_date_handler(event, context):
+def post_user_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
     access to the request and response payload, including headers and
     status code.
@@ -33,16 +32,13 @@ def post_date_handler(event, context):
     operation = event['httpMethod']
 
     if operation == "POST":
-        userId = event["pathParameters"]["userId"]
-        date = event["pathParameters"]["date"]
-        emojis = generateCoolEmojis()
-        horoscope = {"userId": userId, "date": str(date), "emojis": str(emojis), "feedback": ""}
+        # TODO any sort of data validation
+        body = json.load(event["body"])
+        if "userId" not in body.keys():
+            body["userId"] = generate_uuid()
         table = dynamo.Table(table_name)
-        resp = table.put_item(Item = horoscope)
+        resp = table.put_item(Item = body)
         return respond(None, resp)
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))
 
-def generateCoolEmojis():
-    # [{'code': 'U+3299', 'name': 'Japanese “secret” button', 'image': '㊙', 'category': 'Symbols'}, {'code': 'U+1F6F8', 'name': 'flying saucer', 'image': '🛸', 'category': 'Travel & Places'}, {'code': 'U+271D', 'name': 'latin cross', 'image': '✝', 'category': 'Symbols'}]
-    return [(emojigen.get_random_emojis(1)[0]["image"]) for x in range(3)]
