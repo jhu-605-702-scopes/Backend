@@ -18,7 +18,7 @@ def respond(err, res=None):
     }
 
 
-def get_userid_handler(event, context):
+def get_user_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
     access to the request and response payload, including headers and
     status code.
