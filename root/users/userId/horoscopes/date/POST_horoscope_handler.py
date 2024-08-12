@@ -4,7 +4,7 @@ import emoji_generator.random_emoji as emojigen
 
 print('Loading function')
 
-dynamo = boto3.resource('dynamodb', region_name="us-east-2")
+dynamo = boto3.resource('dynamodb', region_name="us-east-1")
 table_name = 'Horoscopes'
 
 def respond(err, res=None):

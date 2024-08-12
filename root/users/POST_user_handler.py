@@ -3,7 +3,7 @@ import json
 
 print('Loading function')
 
-dynamo = boto3.resource('dynamodb', region_name="us-east-2")
+dynamo = boto3.resource('dynamodb', region_name="us-east-1")
 table_name = 'Users'
 
 def respond(err, res=None):
