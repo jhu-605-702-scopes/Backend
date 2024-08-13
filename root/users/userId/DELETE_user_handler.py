@@ -30,7 +30,7 @@ def delete_user_handler(event, context):
     '''
     # print("Received event: " + json.dumps(event, indent=2))
 
-    operation = event['httpMethod']
+    operation = event['context']['http-method']
 
     if operation == "GET":
         userId = event["pathParameters"]["userId"]

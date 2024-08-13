@@ -18,7 +18,7 @@ def respond(err, res=None):
 
 def post_notification_handler(event, context):
     '''Registers a user's notification token with the SNS service'''
-    operation = event['httpMethod']
+    operation = event['context']['http-method']
     func_arn = context.invoked_function_arn.split(':')
     #func_arn[3] is region, func_arn[4] is account
     topic_arn = 'arn:aws:sns:'+func_arn[3]+':'+func_arn[4]+':scopesapp'

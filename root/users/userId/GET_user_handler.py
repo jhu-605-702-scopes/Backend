@@ -29,12 +29,11 @@ def get_user_handler(event, context):
     '''
     # print("Received event: " + json.dumps(event, indent=2))
 
-    operation = event['httpMethod']
+    operation = event['context']['http-method']
 
     if operation == "GET":
         userId = event["pathParameters"]["userId"]
         date = event["pathParameters"]["date"]
-        # emojis = generateCoolEmojis()
         table = dynamo.Table(table_name)
         item = table.get_item(Key={
             'userId': userId})['Item']
