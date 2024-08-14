@@ -1,4 +1,5 @@
 import boto3
+import json
 
 print('Loading function')
 
@@ -17,7 +18,7 @@ def respond(err, res=None):
 def post_login_handler(event, context):
     '''Handles user login by verifying email and password.'''
     # Extract email and password from the request body
-    body = event["body-json"]
+    body = json.loads(event["body"])
     email = body.get("email")
     password = body.get("password")
 
@@ -35,7 +36,6 @@ def post_login_handler(event, context):
         return respond(ValueError('Invalid email or password'))
 
     user = response['Items'][0]
-    print(user)
 
     # Check if the provided password matches the stored password
     if user['password'] != password:
