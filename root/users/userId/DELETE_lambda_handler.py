@@ -1,7 +1,7 @@
 
 import boto3
 import json
-import emoji_generator.random_emoji as emojigen
+#import emoji_generator.random_emoji as emojigen
 
 print('Loading function')
 
