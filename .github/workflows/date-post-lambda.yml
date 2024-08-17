@@ -1,0 +1,29 @@
+name: Deploy Post-Date Lambda
+
+on:
+  push:
+    paths:
+      - 'root/users/userId/horoscopes/date/POST_lambda_handler.py'
+    branches:
+      - main
+
+jobs:
+  lambda-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy Function
+        run: |
+          echo "Zipping deployment package..."
+          cd root/users/userId/horoscopes/date
+          zip -r deployment_package.zip POST_lambda_handler.py emoji_generator emoji_generator-0.7.dist-info
+          echo "Updating lambda Function..."
+          aws lambda update-function-code --function-name post-horoscope-handler --zip-file fileb://./deployment_package.zip
+          echo "Done."
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
