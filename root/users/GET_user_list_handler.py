@@ -1,5 +1,6 @@
 import boto3
 import json
+from boto3.dynamodb.conditions import Key
 
 print('Loading function')
 
@@ -10,7 +11,7 @@ table_name = 'Users'
 def respond(err, res=None):
     return {
         'statusCode': '400' if err else '200',
-        'body': json.dumps({"error": str(err)}) if err else json.dumps(res),
+        'body': {"error": str(err)} if err else res,
         'headers': {
             'Content-Type': 'application/json',
         },

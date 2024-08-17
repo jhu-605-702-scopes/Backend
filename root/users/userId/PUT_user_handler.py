@@ -1,5 +1,6 @@
 import boto3
 import json
+from boto3.dynamodb.conditions import Key
 
 print('Loading function')
 
@@ -32,8 +33,9 @@ def put_user_handler(event, context):
     operation = event['context']['http-method']
 
     if operation == "PUT":
-        userId = event["pathParameters"]["userId"]
-        user = json.load(event["body"])
+        userId = event["params"]["path"]["userId"]
+        user = event["body-json"]
+        user['userId'] = userId
         table = dynamo.Table(table_name)
         resp = table.put_item(Item = user)
         return respond(None, resp)

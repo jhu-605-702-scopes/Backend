@@ -32,17 +32,18 @@ def get_horoscope_handler(event, context):
     operation = event['context']['http-method']
 
     if operation == "GET":
-        userId = event["pathParameters"]["userId"]
-        date = event["pathParameters"]["date"]
+        userId = event["params"]["path"]["userId"]
+        date = event["params"]["path"]["date"]
         # emojis = generateCoolEmojis()
         table = dynamo.Table(table_name)
         item = table.get_item(Key={
             'userId': userId,
             'date': date})['Item']
-        horoscope = {"userId": item['userId']['N'],
-                     "date": item['date']['S'],
-                     "emojis": item['emojis']['S'],
-                     "feedback": item["feedback"]["S"]}
+        print("item", item)
+        horoscope = {"userId": item['userId'],
+                     "date": item['date'],
+                     "emojis": item['emojis'],
+                     "feedback": item["feedback"]}
 
         return respond(None, horoscope)
     else:

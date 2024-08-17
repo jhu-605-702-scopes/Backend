@@ -1,10 +1,11 @@
 import boto3
 import json
+from boto3.dynamodb.conditions import Key
 
 print('Loading function')
 
 dynamo = boto3.resource('dynamodb', region_name="us-east-1")
-table_name = 'Horoscopes'
+table_name = 'Users'
 
 
 def respond(err, res=None):
@@ -32,16 +33,17 @@ def get_user_handler(event, context):
     operation = event['context']['http-method']
 
     if operation == "GET":
-        userId = event["pathParameters"]["userId"]
-        date = event["pathParameters"]["date"]
+        userId = event["params"]["path"]["userId"]
+        # emojis = generateCoolEmojis()
         table = dynamo.Table(table_name)
         item = table.get_item(Key={
             'userId': userId})['Item']
-        user = {"id": item['userId']['N'],
-                     "name": item['name']['S'],
-                     "username": item['username']['S'],
-                     "email": item["email"]["S"]}
+        print("item: ", item)
+        user = {"id": item['userId'],
+                     "name": item['name'] if ('name' in item) else None,
+                     "username": item['username'] if ('username' in item) else None,
+                     "email": item['email'] if ('email' in item) else None}
 
-        return respond(None, item)
+        return respond(None, user)
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))

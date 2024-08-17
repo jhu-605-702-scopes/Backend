@@ -1,5 +1,6 @@
 import boto3
 import json
+from boto3.dynamodb.conditions import Key
 
 print('Loading function')
 
@@ -29,9 +30,10 @@ def get_horoscope_list_handler(event, context):
     '''
     # print("Received event: " + json.dumps(event, indent=2))
 
-    operation = event['context']['http-method']
+    operation = event["context"]['http-method']
+
     if operation == "GET":
-        userId = event["pathParameters"]["userId"]
+        userId = event["params"]["path"]["userId"]
         table = dynamo.Table(table_name)
         items = table.query(KeyConditionExpression=Key('userId').eq(userId))["Items"]
         return respond(None, items)
