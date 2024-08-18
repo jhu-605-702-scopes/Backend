@@ -39,11 +39,11 @@ def post_horoscope_handler(event, context):
         date = event["params"]["path"]["date"]
         body = event["body-json"]
         feedback = ""
-        emojis = ""
+        emojis = generateCoolEmojis()
         if body:
             print(body)
             feedback = body.get("feedback", "")
-            emojis = body.get("emojis", generateCoolEmojis())
+            emojis = body.get("emojis", emojis)
         horoscope = {"userId": userId, "date": str(date), "emojis": str(emojis), "feedback": feedback}
         table = dynamo.Table(table_name)
         try:
