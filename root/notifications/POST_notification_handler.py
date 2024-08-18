@@ -3,8 +3,8 @@ import json
 
 print('Loading notifications function')
 
-sns = boto3.client('sns', region_name="us-east-2")
-topic_arn = 'arn:aws:sns:us-east-1:819873747797:scopes'
+sns = boto3.client('sns', region_name="us-east-1")
+# topic_arn = 'arn:aws:sns:us-east-1:819873747797:scopes'
 
 def respond(err, res=None):
     return {
@@ -16,9 +16,12 @@ def respond(err, res=None):
     }
 
 
-def lambda_handler(event, context):
+def post_notification_handler(event, context):
     '''Registers a user's notification token with the SNS service'''
     operation = event['httpMethod']
+    func_arn = context.invoked_function_arn.split(':')
+    #func_arn[3] is region, func_arn[4] is account
+    topic_arn = 'arn:aws:sns:'+func_arn[3]+':'+func_arn[4]+':scopesapp'
     if operation == "POST":
         body = json.load(event["body"])
         if "token" not in body.keys():

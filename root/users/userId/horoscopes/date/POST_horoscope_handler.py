@@ -1,10 +1,12 @@
 import boto3
 import json
 import emoji_generator.random_emoji as emojigen
+from boto3.dynamodb.conditions import Key
+from botocore.exceptions import ClientError
 
 print('Loading function')
 
-dynamo = boto3.resource('dynamodb', region_name="us-east-2")
+dynamo = boto3.resource('dynamodb', region_name="us-east-1")
 table_name = 'Horoscopes'
 
 def respond(err, res=None):
@@ -17,7 +19,7 @@ def respond(err, res=None):
     }
 
 
-def lambda_handler(event, context):
+def post_horoscope_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
     access to the request and response payload, including headers and
     status code.
@@ -30,16 +32,19 @@ def lambda_handler(event, context):
     #print("Received event: " + json.dumps(event, indent=2))
 
 
-    operation = event['httpMethod']
+    operation = event['context']['http-method']
 
     if operation == "POST":
-        userId = event["pathParameters"]["userId"]
-        date = event["pathParameters"]["date"]
+        userId = event["params"]["path"]["userId"]
+        date = event["params"]["path"]["date"]
         emojis = generateCoolEmojis()
         horoscope = {"userId": userId, "date": str(date), "emojis": str(emojis), "feedback": ""}
         table = dynamo.Table(table_name)
-        resp = table.put_item(Item = horoscope)
-        return respond(None, resp)
+        try:
+            resp = table.put_item(Item = horoscope)
+            return respond(None, horoscope)
+        except ClientError as e:
+            return respond(ClientError, None)
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))
 
