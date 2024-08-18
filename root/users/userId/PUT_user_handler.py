@@ -1,10 +1,10 @@
 import boto3
 import json
-import emoji_generator.random_emoji as emojigen
+from boto3.dynamodb.conditions import Key
 
 print('Loading function')
 
-dynamo = boto3.resource('dynamodb', region_name="us-east-2")
+dynamo = boto3.resource('dynamodb', region_name="us-east-1")
 table_name = 'Users'
 
 def respond(err, res=None):
@@ -17,7 +17,7 @@ def respond(err, res=None):
     }
 
 
-def lambda_handler(event, context):
+def put_user_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
     access to the request and response payload, including headers and
     status code.
@@ -30,11 +30,12 @@ def lambda_handler(event, context):
     #print("Received event: " + json.dumps(event, indent=2))
 
 
-    operation = event['httpMethod']
+    operation = event['context']['http-method']
 
     if operation == "PUT":
-        userId = event["pathParameters"]["userId"]
-        user = json.load(event["body"])
+        userId = event["params"]["path"]["userId"]
+        user = event["body-json"]
+        user['userId'] = userId
         table = dynamo.Table(table_name)
         resp = table.put_item(Item = user)
         return respond(None, resp)

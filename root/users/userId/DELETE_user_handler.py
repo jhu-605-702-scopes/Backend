@@ -1,10 +1,13 @@
+
 import boto3
 import json
+from boto3.dynamodb.conditions import Key
 
 print('Loading function')
 
-dynamo = boto3.resource('dynamodb', region_name="us-east-2")
+dynamo = boto3.resource('dynamodb', region_name="us-east-1")
 table_name = 'Users'
+
 
 def respond(err, res=None):
     return {
@@ -16,7 +19,7 @@ def respond(err, res=None):
     }
 
 
-def lambda_handler(event, context):
+def delete_user_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
     access to the request and response payload, including headers and
     status code.
@@ -26,19 +29,19 @@ def lambda_handler(event, context):
     PUT, or DELETE request respectively, passing in the payload to the
     DynamoDB API as a JSON body.
     '''
-    #print("Received event: " + json.dumps(event, indent=2))
+    print("Received event: " + json.dumps(event, indent=2))
 
+    operation = event['context']['http-method']
 
-    operation = event['httpMethod']
-
-    if operation == "POST":
-        # TODO any sort of data validation
-        body = json.load(event["body"])
-        if "userId" not in body.keys():
-            body["userId"] = generate_uuid()
+    if operation == "DELETE":
+        userId = event["params"]["path"]["userId"]
+        print(event["params"]["path"])
         table = dynamo.Table(table_name)
-        resp = table.put_item(Item = body)
-        return respond(None, resp)
+        item = table.delete_item(Key={
+            'userId': userId})
+
+        return respond(None, item)
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))
+
 

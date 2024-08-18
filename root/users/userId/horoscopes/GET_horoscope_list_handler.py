@@ -1,24 +1,24 @@
 import boto3
 import json
-import emoji_generator.random_emoji as emojigen
+from boto3.dynamodb.conditions import Key
 
 print('Loading function')
 
-dynamo = boto3.resource('dynamodb', region_name="us-east-2")
-table_name = 'Users'
+dynamo = boto3.resource('dynamodb', region_name="us-east-1")
+table_name = 'Horoscopes'
 
 
 def respond(err, res=None):
     return {
         'statusCode': '400' if err else '200',
-        'body': json.dumps({"error": str(err)}) if err else json.dumps(res),
+        'body': {"error": str(err)} if err else res,
         'headers': {
             'Content-Type': 'application/json',
         },
     }
 
 
-def lambda_handler(event, context):
+def get_horoscope_list_handler(event, context):
     '''Demonstrates a simple HTTP endpoint using API Gateway. You have full
     access to the request and response payload, including headers and
     status code.
@@ -30,11 +30,12 @@ def lambda_handler(event, context):
     '''
     # print("Received event: " + json.dumps(event, indent=2))
 
-    operation = event['httpMethod']
+    operation = event["context"]['http-method']
 
     if operation == "GET":
+        userId = event["params"]["path"]["userId"]
         table = dynamo.Table(table_name)
-        items = table.scan()["Items"]
+        items = table.query(KeyConditionExpression=Key('userId').eq(userId))["Items"]
         return respond(None, items)
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))
