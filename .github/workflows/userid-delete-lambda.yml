@@ -3,7 +3,7 @@ name: Deploy Delete-UserId Lambda
 on:
   push:
     paths:
-      - 'root/users/userId/DELETE_lambda_handler.py'
+      - 'root/users/userId/DELETE_user_handler.py'
     branches:
       - main
 
@@ -19,7 +19,7 @@ jobs:
         run: |
           echo "Zipping deployment package..."
           cd root/users/userId
-          zip -r deployment_package.zip DELETE_lambda_handler.py
+          zip -r deployment_package.zip DELETE_user_handler.py
           echo "Updating lambda Function..."
           aws lambda update-function-code --function-name delete-user-handler --zip-file fileb://./deployment_package.zip
           echo "Done."

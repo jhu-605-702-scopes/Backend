@@ -3,7 +3,7 @@ name: Deploy Post-Date Lambda
 on:
   push:
     paths:
-      - 'root/users/userId/horoscopes/date/POST_lambda_handler.py'
+      - 'root/users/userId/horoscopes/date/POST_horoscope_handler.py'
     branches:
       - main
 
@@ -19,7 +19,7 @@ jobs:
         run: |
           echo "Zipping deployment package..."
           cd root/users/userId/horoscopes/date
-          zip -r deployment_package.zip POST_lambda_handler.py emoji_generator emoji_generator-0.7.dist-info
+          zip -r deployment_package.zip POST_horoscope_handler.py emoji_generator emoji_generator-0.7.dist-info
           echo "Updating lambda Function..."
           aws lambda update-function-code --function-name post-horoscope-handler --zip-file fileb://./deployment_package.zip
           echo "Done."

@@ -3,7 +3,7 @@ name: Deploy Notifications Post Lambda
 on:
   push:
     paths:
-      - 'root/notifications/**'
+      - 'root/notifications/POST_notification_handler.py'
     branches:
       - main
 
@@ -19,7 +19,7 @@ jobs:
         run: |
           echo "Zipping deployment package..."
           cd root/notifications
-          zip -r deployment_package.zip .
+          zip -r deployment_package.zip POST_notification_handler.py
           echo "Updating lambda Function..."
           aws lambda update-function-code --function-name post-notification-handler --zip-file fileb://./deployment_package.zip
           echo "Done."

@@ -3,7 +3,7 @@ name: Deploy Get-Date Lambda
 on:
   push:
     paths:
-      - 'root/users/userId/horoscopes/date/GET_lambda_handler.py'
+      - 'root/users/userId/horoscopes/date/GET_horoscope_handler.py'
     branches:
       - main
 
@@ -19,7 +19,7 @@ jobs:
         run: |
           echo "Zipping deployment package..."
           cd root/users/userId/horoscopes/date
-          zip -r deployment_package.zip GET_lambda_handler.py
+          zip -r deployment_package.zip GET_horoscope_handler.py
           echo "Updating lambda Function..."
           aws lambda update-function-code --function-name get-horoscope-handler --zip-file fileb://./deployment_package.zip
           echo "Done."

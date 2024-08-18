@@ -3,7 +3,7 @@ name: Deploy Put-UserId Lambda
 on:
   push:
     paths:
-      - 'root/users/userId/PUT_lambda_handler.py'
+      - 'root/users/userId/PUT_user_handler.py'
     branches:
       - main
 
@@ -19,7 +19,7 @@ jobs:
         run: |
           echo "Zipping deployment package..."
           cd root/users/userId
-          zip -r deployment_package.zip PUT_lambda_handler.py
+          zip -r deployment_package.zip PUT_user_handler.py
           echo "Updating lambda Function..."
           aws lambda update-function-code --function-name put-user-handler --zip-file fileb://./deployment_package.zip
           echo "Done."
