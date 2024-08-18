@@ -37,6 +37,10 @@ def post_horoscope_handler(event, context):
     if operation == "POST":
         userId = event["params"]["path"]["userId"]
         date = event["params"]["path"]["date"]
+        body = event["body-json"]
+        if body:
+            print(body)
+        return respond(None, body)
         emojis = generateCoolEmojis()
         horoscope = {"userId": userId, "date": str(date), "emojis": str(emojis), "feedback": ""}
         table = dynamo.Table(table_name)
