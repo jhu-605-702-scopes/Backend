@@ -22,7 +22,8 @@ def send_notification(event, context):
             PlatformApplicationArn=APPLICATION_ARN
         )
         endpoints = [
-            endpoint['EndpointArn'] for endpoint in response['Endpoints'] if endpoint['Attributes']['Enabled'] == 'true'
+            endpoint['EndpointArn'] for endpoint in response['Endpoints'] \
+                if endpoint['Attributes']['Enabled'] == 'true'
         ]
         # Send notification to all users
         for endpoint in endpoints:
