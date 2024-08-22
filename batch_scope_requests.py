@@ -22,21 +22,33 @@ class BatchScopeRequests:
 
     # async function to make a single create user request
     async def create_user(self, url, session, number_to_run):
-        for i in range (number_to_run):
+        i = 0
+        while i < number_to_run:
             async with session.post(url, ssl=False, json={"username": "DeleteThisUser"}, headers=self.headers) as response:
                 status = response.status
                 data = await response.json()
-                self.test_users_ids.append(data["body"]["userId"])
+                try:
+                    self.test_users_ids.append(data["body"]["userId"])
+                    i += 1
+                except KeyError as e:
+                    print("Timeout errors have begun")
+                    i -= 1
+
 
     # async function to create a single user's horoscope request
     async def create_horoscope(self, url, session, number_to_run):
         full_url = self.create_horoscope_url.format(self.test_users_ids.pop(), self.date)
-        for i in range (number_to_run):
+        i = 0
+        while i < number_to_run:
             async with session.post(full_url, ssl=False, json=None, headers=self.headers) as response:
                 status = response.status
                 data = await response.json()
-                emojis = json.loads(data["body"])["emojis"]
-                self.test_users_horoscopes.append(emojis)
+                try:
+                    emojis = json.loads(data["body"])["emojis"]
+                    self.test_users_horoscopes.append(emojis)
+                except KeyError as e:
+                    print("Timeout errors have begun")
+                    i -= 1
 
     # async function to make multiple requests
     async def create_users(self, url):
